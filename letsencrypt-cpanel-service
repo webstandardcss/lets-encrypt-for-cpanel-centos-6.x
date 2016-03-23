@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export CRON="0 0 */60 * * /usr/local/sbin/letsencrypt-cpanel-service.sh"
+
+echo "Using email address root@${HOSTNAME}"
+/root/letsencrypt/letsencrypt-auto --text --agree-tos --email root@$HOSTNAME certonly --renew-by-default --webroot --webroot-path /usr/local/apache/htdocs/ -d $HOSTNAME
+
+/usr/local/sbin/letsencrypt-cpanel-installservice.sh
+
+crontab -l | { cat; echo "${CRON}"; } | crontab -
