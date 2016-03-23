@@ -6,12 +6,6 @@ export OS_ARCH=$(echo ${OS_RELEASE}|grep -o '..$')
 echo "OS Release is: ${OS_RELEASE}"
 echo "Your OS version is: ${OS_VERSION}"
 echo "You have a ${OS_ARCH} bit processor."
-echo ""
-echo "Generated file is located at: /root/installssl.pl"
-echo "so that cPanel API can install your generate cert."
-echo "For security you will not see the password you type."
-echo "Enter your root password: "
-read -s ROOTPASS
 
 if [ "${OS_VERSION}" -ge "7" ]
 then
@@ -42,73 +36,6 @@ cat << "EOF" > /usr/local/sbin/userdomains
 #!/bin/bash
 
 grep -E ": $1\$" /etc/userdomains | awk '{print$1}' | sed 's/:$//'
-EOF
-
-touch /root/installssl.pl
-chmod 755 /root/installssl.pl
-cat << "EOF" > /root/installssl.pl
-#!/usr/local/cpanel/3rdparty/bin/perl
-
-use strict;
-use LWP::UserAgent;
-use LWP::Protocol::https;
-use MIME::Base64;
-use IO::Socket::SSL;
-use URI::Escape;
-
-my $user = "root";
-EOF
-
-cat << EOF >> /root/installssl.pl
-my \$pass = "${ROOTPASS}";
-EOF
-
-cat << "EOF" >> /root/installssl.pl
-my $auth = "Basic " . MIME::Base64::encode( $user . ":" . $pass );
-
-my $ua = LWP::UserAgent->new(
-    ssl_opts   => { verify_hostname => 0, SSL_verify_mode => 'SSL_VERIFY_NONE', SSL_use_cert => 0 },
-);
-
-my $dom = $ARGV[0];
-
-my $certfile = "/etc/letsencrypt/live/$dom/cert.pem";
-my $keyfile = "/etc/letsencrypt/live/$dom/privkey.pem";
-my $cafile =  "/etc/letsencrypt/live/bundle.txt";
-
-my $certdata;
-my $keydata;
-my $cadata;
-
-open(my $certfh, '<', $certfile) or die "cannot open file $certfile";
-    {
-        local $/;
-        $certdata = <$certfh>;
-    }
-    close($certfh);
-
-open(my $keyfh, '<', $keyfile) or die "cannot open file $keyfile";
-    {
-        local $/;
-        $keydata = <$keyfh>;
-    }
-    close($keyfh);
-
-open(my $cafh, '<', $cafile) or die "cannot open file $cafile";
-    {
-        local $/;
-        $cadata = <$cafh>;
-    }
-    close($cafh);
-
-my $cert = uri_escape($certdata);
-my $key = uri_escape($keydata);
-my $ca = uri_escape($cadata);
-
-my $request = HTTP::Request->new( POST => "https://127.0.0.1:2087/json-api/installssl?api.version=1&domain=$dom&crt=$cert&key=$key&cab=$ca" );
-$request->header( Authorization => $auth );
-my $response = $ua->request($request);
-print $response->content;
 EOF
 
 mkdir -p /etc/letsencrypt/live/
@@ -143,7 +70,9 @@ f1w8DdnkabOLGeOVcj9LQ+s67vBykx4anTjURkbqZslUEUsn2k5xeua2zUk=
 -----END CERTIFICATE-----
 EOFFF
 
+cp /etc/letsencrypt/live/bundle.txt /etc/letsencrypt/live/bundle.crt
+
 echo '** Done installing certificate'
 echo '**** Usage below' 
-echo '** NOTE: Will need to make sure that /root/installpl.ssl exists. see https://forums.cpanel.net/threads/how-to-installing-ssl-from-lets-encrypt.513621/ for details.'
+echo '** See https://forums.cpanel.net/threads/how-to-installing-ssl-from-lets-encrypt.513621/ for details.'
 echo '****'

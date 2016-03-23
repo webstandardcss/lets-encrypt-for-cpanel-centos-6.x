@@ -90,5 +90,4 @@ If you need to manually run `lets-encrypt-cpanel $USERNAME $DOMAIN $EMAIL` becau
 
 * The script downloads and sets up your python environment to use Let's Encrypt with cPanel
 * Then it installs Let's Encrypt into the `/root/` directory
-* Script generates the `/root/installssl.pl` and prompts for the root password which is inserted into the WHM api wrapper perl script. 
 * The SSL certificate is placed in `/etc/letsencrypt/live/bundle.txt` when installing Let's Encrypt.

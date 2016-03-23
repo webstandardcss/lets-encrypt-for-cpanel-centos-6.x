@@ -38,6 +38,7 @@ export CRON="0 0 */60 * * /usr/local/sbin/letsencrypt-cpanel.sh ${USERNAME} ${DO
 
 echo "Using email address ${EMAIL}"
 /root/letsencrypt/letsencrypt-auto --text --agree-tos --email ${EMAIL} certonly --renew-by-default --webroot --webroot-path /home/${USERNAME}/public_html/ -d ${DOMAIN} -d www.${DOMAIN}
-/root/installssl.pl ${DOMAIN}
+
+/usr/local/sbin/letsencrypt-cpanel-installssl.sh ${DOMAIN}
 
 crontab -l | { cat; echo "${CRON}"; } | crontab -

@@ -28,4 +28,4 @@ echo "Found Domain Name ${DOMAIN}"
 
 /root/letsencrypt/letsencrypt-auto --text certonly --renew-by-default --webroot --webroot-path /home/${USERNAME}/public_html/ -d ${DOMAIN} -d www.${DOMAIN}
 
-/root/installssl.pl ${DOMAIN} 
+/usr/local/sbin/letsencrypt-cpanel-installssl.sh ${DOMAIN} 
