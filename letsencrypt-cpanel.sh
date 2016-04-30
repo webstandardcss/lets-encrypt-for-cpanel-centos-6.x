@@ -26,6 +26,8 @@ fi
 
 echo "Found Domain Name ${DOMAIN}"
 
-/root/letsencrypt/letsencrypt-auto --text certonly --renew-by-default --webroot --webroot-path /home/${USERNAME}/public_html/ -d ${DOMAIN} -d www.${DOMAIN}
+DOCROOT=`whmapi1 domainuserdata domain=${DOMAIN} |grep 'documentroot:' |sed 's/.*documentroot: //'`
+
+/root/letsencrypt/letsencrypt-auto --text certonly --renew-by-default --webroot --webroot-path ${DOCROOT} -d ${DOMAIN} -d www.${DOMAIN}
 
 /usr/local/sbin/letsencrypt-cpanel-installssl.sh ${DOMAIN} 
